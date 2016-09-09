@@ -12,7 +12,7 @@ __all__ = ['MemoryDriver', 'RedisDriver']
 config_register('state-driver', 'redis')
 config_register('random', {
     'weight[int]': '66',
-    'seed': random.sample(string.letters, 16)
+    'seed': ''.join(random.sample(string.letters, 16))
 })
 config_register('redis', {
     'host': 'localhost',
@@ -21,11 +21,17 @@ config_register('redis', {
 })
 
 
+class Garbage(str):
+    def __bool__(self):
+        return False
+    __nonzero__ = __bool__
+
+
 class BaseDriver(object):
     def __init__(self, config):
         self.config = config
         random_config = config['random']
-        self.random_gen = random.Random(random_config['seed'])
+        self.random_gen = random.Random()
         self.random_weight = random_config['weight']
 
     def append(self, key, value):
@@ -42,13 +48,15 @@ class BaseDriver(object):
     def random(self, *keys):
         for key in keys:
             if self.weighted_rand():
-                break
-        else:
-            key = self.random_key()
+                value = self.random_choice(self.getall(key))
+                if value:
+                    return value
         try:
-            return self.random_choice(self.getall(key))
+            key = self.random_key()
         except IndexError:
             return self.random_garbage()
+        else:
+            return self.random_choice(self.getall(key))
 
     def random_key(self):
         raise NotImplementedError()
@@ -62,12 +70,12 @@ class BaseDriver(object):
     def random_garbage(self):
         garbage = ''
         letters = string.ascii_lowercase+'   '
-        for idx_ in range(32):
+        for idx_ in range(16):
             letter = self.random_gen.choice(letters)
             if letter == ' ':
                 break
             garbage += letter
-        return garbage
+        return Garbage(garbage)
 
 
 class MemoryDriver(BaseDriver):
