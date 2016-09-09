@@ -34,7 +34,7 @@ def main():
     if args.command == 'learn':
         AELearn(config).learn(args.args)
     elif args.command == 'tweet':
-        Twitter(config).tweet(args.args)
+        Twitter(config).tweet(Markov(config).say())
     elif args.command == 'say':
         print(Markov(config).say())
     return 0

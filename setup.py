@@ -19,6 +19,7 @@ setup(
     install_requires=[
         'redis',
         'requests',
+        'requests-oauthlib',
         'six'
     ],
     entry_points={

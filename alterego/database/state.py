@@ -12,7 +12,7 @@ __all__ = ['MemoryDriver', 'RedisDriver']
 config_register('state-driver', 'redis')
 config_register('random', {
     'weight[int]': '66',
-    'seed': ''.join(random.sample(string.letters, 16))
+    # 'seed': ''.join(random.sample(string.letters, 16))
 })
 config_register('redis', {
     'host': 'localhost',
@@ -48,7 +48,7 @@ class BaseDriver(object):
     def random(self, *keys):
         for key in keys:
             if self.weighted_rand():
-                value = self.random_choice(self.getall(key))
+                value = self.random_choice(set(self.getall(key)))
                 if value:
                     return value
         try:
