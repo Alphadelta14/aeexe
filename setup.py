@@ -9,7 +9,7 @@ Author: Alpha <alpha@pokesplash.net>
 from setuptools import setup
 
 setup(
-    name='aeexe',
+    name='alterego',
     version='0.1.0',
     description='aeexe',
     url='https://github.com/Alphadelta14/aeexe',

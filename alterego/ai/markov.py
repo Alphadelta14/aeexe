@@ -6,10 +6,10 @@ import six.moves
 
 from alterego.config import config_register
 
-config_register('max-last', 2)
+config_register('max-last[int]', 2)
 
 
-class Parser(object):
+class Markov(object):
     def __init__(self, config):
         self.state = config.state_driver()
         self.maxlast = config['max-last']
@@ -18,9 +18,26 @@ class Parser(object):
         """Read some text and create new Markov mappings
         """
         words = re.split(r'\W+', text)
-        last = deque(maxlen=self.maxlast)
+        queue = deque(maxlen=self.maxlast)
         for next_word in words:
-            for idx in six.moves.range(len(last)):
-                key = ' '.join(last[idx:])
+            last = []
+            for recent in queue:
+                last.append(recent)
+                key = ' '.join(last)
                 self.state.append(key, next_word)
-            last.append(next_word)
+            queue.append(next_word)
+
+    def say(self, message_length=100):
+        queue = deque(maxlen=self.maxlast)
+        message = self.state.random()
+        queue.append(message)
+        while len(message) < message_length:
+            keys = []
+            last = []
+            for recent in queue:
+                last.append(recent)
+                keys.append(' '.join(recent))
+            word = self.state.random(*keys)
+            message += ' '+word
+            queue.append(word)
+        return message

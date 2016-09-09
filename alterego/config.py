@@ -23,13 +23,14 @@ class Configuration(object):
     def _set_defaults(self):
         """Set defaults for config
         """
-        defaults = dict(item for item in self.defaults.items() if not isinstance(item[1], dict))
         self._config.add_section('main')
-        self._config.set('main', defaults)
         for key, value in six.iteritems(self.defaults):
             if isinstance(value, dict):
                 self._config.add_section(key)
-                self._config.set(key, value)
+                for subkey, subvalue in six.iteritems(value):
+                    self._config.set(key, subkey, subvalue)
+            else:
+                self._config.set('main', key, value)
 
     def load(self, filename):
         """Load the configuration by filename
@@ -40,7 +41,7 @@ class Configuration(object):
         """Save the configuration to a file
         """
         with open(filename, 'w') as handle:
-            self._config.write(filename)
+            self._config.write(handle)
 
     @staticmethod
     def sanitize(items):
@@ -74,9 +75,9 @@ class Configuration(object):
         from database import state
 
         if self._state_driver is None:
-            if self['state_driver'] == 'redis':
+            if self['state-driver'] == 'redis':
                 self._state_driver = state.RedisDriver(self)
-            elif self['state_driver'] == 'dict':
+            elif self['state-driver'] == 'dict':
                 self._state_driver = state.MemoryDriver(self)
             else:
                 raise ValueError('Unknown state driver')
