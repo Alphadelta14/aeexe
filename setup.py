@@ -17,7 +17,7 @@ setup(
     author_email='alpha@pokesplash.net',
     license='MIT',
     install_requires=[
-        'redis-py',
+        'redis',
         'requests',
         'six'
     ],
@@ -33,7 +33,6 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
-        'Framework :: Flask',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: MIT License',
