@@ -40,6 +40,9 @@ class BaseDriver(object):
     def getall(self, key):
         raise NotImplementedError()
 
+    def exists(self, key):
+        raise NotImplementedError()
+
     def weighted_rand(self):
         if self.random_gen.randint(0, 100) < self.random_weight:
             return True
@@ -62,7 +65,7 @@ class BaseDriver(object):
         raise NotImplementedError()
 
     def random_choice(self, values):
-        if self.weighted_rand() and values:
+        if values:
             return self.random_gen.choice(values)
         return self.random_garbage()
 
@@ -92,6 +95,9 @@ class MemoryDriver(BaseDriver):
     def getall(self, key):
         return self._data[key]
 
+    def exists(self, key):
+        return key in self._data
+
     def random_key(self):
         return self.random_gen.choice(self._data.keys())
 
@@ -106,6 +112,9 @@ class RedisDriver(BaseDriver):
 
     def getall(self, key):
         return self._conn.lrange(key, 0, -1)
+
+    def exists(self, key):
+        return self._conn.type(key) != 'none'
 
     def random_key(self):
         return self._conn.randomkey()

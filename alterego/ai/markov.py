@@ -27,25 +27,30 @@ class Markov(object):
             for next_word in words:
                 if not next_word:
                     continue
-                if next_word in queue:
+                if queue and queue[-1] == next_word:
                     continue
-                last = []
-                for recent in queue:
-                    last.insert(0, recent)
-                    key = ' '.join(last)
+                lqueue = list(queue)
+                while lqueue:
+                    key = ' '.join(lqueue)
+                    lqueue.pop(0)
                     self.state.append(key, next_word)
                 queue.append(next_word)
 
     def say(self, message_length=100):
-        queue = deque([self.state.random()], maxlen=self.maxlast)
-        message = ' '.join(queue)
+        message = ''
+        queue = deque(['']*self.maxlast, maxlen=self.maxlast)
         while len(message) < message_length:
             keys = []
-            last = list(reversed(queue))
-            for idx in six.moves.range(len(last)):
-                keys.append(' '.join(last[:idx+1]))
-            word = self.state.random(*keys[::-1])
-            message += ' '+word
+            lqueue = list(queue)
+            while lqueue:
+                key = ' '.join(lqueue)
+                keys.append(' '.join(lqueue))
+                lqueue.pop(0)
+            word = self.state.random(*keys)
+            if not message:
+                message = word
+            else:
+                message += ' '+word
             if word:
                 queue.append(word)
             else:
