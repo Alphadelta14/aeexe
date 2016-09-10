@@ -4,6 +4,7 @@ import re
 
 import six.moves
 
+from alterego.ai.preprocess import preprocess
 from alterego.config import config_register
 
 config_register('max-last[int]', 2)
@@ -18,6 +19,7 @@ class Markov(object):
         """Read some text and create new Markov mappings
         """
         # words = re.split(r'''[^a-zA-Z0-9_'-]+''', text)
+        text = preprocess(text)
         words = re.split(r'\s', text)
         queue = deque(maxlen=self.maxlast)
         for next_word in words:

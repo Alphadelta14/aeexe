@@ -27,3 +27,8 @@ class AELearn(object):
 
     def learn_text(self, text):
         self.markov.parse(text)
+
+    def learn_file(self, location):
+        with open(location) as handle:
+            text = handle.read()
+            self.learn_text(text)
