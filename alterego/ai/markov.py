@@ -17,7 +17,8 @@ class Markov(object):
     def parse(self, text):
         """Read some text and create new Markov mappings
         """
-        words = re.split(r'''[^a-zA-Z0-9_'-]+''', text)
+        # words = re.split(r'''[^a-zA-Z0-9_'-]+''', text)
+        words = re.split(r'\s', text)
         queue = deque(maxlen=self.maxlast)
         for next_word in words:
             if not next_word:
@@ -31,12 +32,11 @@ class Markov(object):
             for recent in queue:
                 last.insert(0, recent)
                 key = ' '.join(last)
-                self.state.append(key.lower(), next_word)
+                self.state.append(key, next_word)
             queue.append(next_word)
 
     def say(self, message_length=100):
-        queue = deque([self.state.random() for idx_ in six.moves.range(self.maxlast)],
-                      maxlen=self.maxlast)
+        queue = deque([self.state.random()], maxlen=self.maxlast)
         message = ' '.join(queue)
         while len(message) < message_length:
             keys = []
@@ -45,7 +45,6 @@ class Markov(object):
                 keys.append(' '.join(last[:idx+1]))
             word = self.state.random(*keys)
             message += ' '+word
-            word = word.lower()
             if word in last:
                 continue
             elif word:
