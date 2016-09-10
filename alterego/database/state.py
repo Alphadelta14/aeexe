@@ -48,7 +48,7 @@ class BaseDriver(object):
     def random(self, *keys):
         for key in keys:
             if self.weighted_rand():
-                value = self.random_choice(set(self.getall(key)))
+                value = self.random_choice(self.getall(key))
                 if value:
                     return value
         try:
@@ -62,9 +62,8 @@ class BaseDriver(object):
         raise NotImplementedError()
 
     def random_choice(self, values):
-        for value in values:
-            if self.weighted_rand():
-                return value
+        if self.weighted_rand() and values:
+            return self.random_gen.choice(values)
         return self.random_garbage()
 
     def random_garbage(self):

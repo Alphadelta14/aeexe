@@ -20,22 +20,21 @@ class Markov(object):
         """
         # words = re.split(r'''[^a-zA-Z0-9_'-]+''', text)
         text = preprocess(text)
-        words = re.split(r'\s', text)
-        queue = deque(maxlen=self.maxlast)
-        for next_word in words:
-            if not next_word:
-                continue
-            if next_word in queue:
-                continue
-            if len(next_word) < 3:
+        lines = text.splitlines()
+        for line in lines:
+            words = re.split(r'\s', line)
+            queue = deque(['']*self.maxlast, maxlen=self.maxlast)
+            for next_word in words:
+                if not next_word:
+                    continue
+                if next_word in queue:
+                    continue
+                last = []
+                for recent in queue:
+                    last.insert(0, recent)
+                    key = ' '.join(last)
+                    self.state.append(key, next_word)
                 queue.append(next_word)
-                continue
-            last = []
-            for recent in queue:
-                last.insert(0, recent)
-                key = ' '.join(last)
-                self.state.append(key, next_word)
-            queue.append(next_word)
 
     def say(self, message_length=100):
         queue = deque([self.state.random()], maxlen=self.maxlast)
@@ -45,11 +44,9 @@ class Markov(object):
             last = list(reversed(queue))
             for idx in six.moves.range(len(last)):
                 keys.append(' '.join(last[:idx+1]))
-            word = self.state.random(*keys)
+            word = self.state.random(*keys[::-1])
             message += ' '+word
-            if word in last:
-                continue
-            elif word:
+            if word:
                 queue.append(word)
             else:
                 try:
