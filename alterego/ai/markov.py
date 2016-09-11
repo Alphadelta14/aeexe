@@ -56,7 +56,7 @@ class Markov(object):
                     queue.popleft()
                 except IndexError:
                     pass
-        match = re.match(r'(.*[.?!])[^.?!]*?$', message)
+        match = re.match(r'(.{{0,{max}}}[.?!])[^.?!]*?$'.format(max=message_length-1), message)
         if match:
             message = match.group(1)
         message = message.lstrip('-')
