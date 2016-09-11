@@ -24,9 +24,7 @@ class Markov(object):
         for line in lines:
             words = re.split(r'\s', line)
             queue = deque(['']*self.maxlast, maxlen=self.maxlast)
-            for next_word in words:
-                if not next_word:
-                    continue
+            for next_word in words+['']:
                 if queue and queue[-1] == next_word:
                     continue
                 lqueue = list(queue)
@@ -49,7 +47,7 @@ class Markov(object):
             word = self.state.random(*keys)
             if not message:
                 message = word
-            else:
+            elif word != '':
                 message += ' '+word
             if word:
                 queue.append(word)
