@@ -23,7 +23,9 @@ punctuation = dict((key, six.u(value)) for (key, value) in six.iteritems(punctua
 
 
 def preprocess(text):
-    text = unicodedata.normalize('NFKD', text.decode('utf8'))
+    if not isinstance(text, six.text_type):
+        text = text.decode('utf8')
+    text = unicodedata.normalize('NFKD', text)
     text = text.translate(punctuation)
     text = text.encode('utf-8')
     return text

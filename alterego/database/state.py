@@ -38,6 +38,12 @@ class BaseDriver(object):
     def append(self, key, value):
         raise NotImplementedError()
 
+    def get(self, key):
+        raise NotImplementedError()
+
+    def set(self, key, value):
+        raise NotImplementedError()
+
     def getall(self, key):
         raise NotImplementedError()
 
@@ -93,6 +99,12 @@ class MemoryDriver(BaseDriver):
             values = self._data[key]
         values.append(value)
 
+    def get(self, key):
+        return self._data[key]
+
+    def set(self, key, value):
+        self._data[key] = value
+
     def getall(self, key):
         return self._data[key]
 
@@ -114,6 +126,12 @@ class RedisDriver(BaseDriver):
 
     def append(self, key, value):
         self._conn.rpush(key, value)
+
+    def get(self, key):
+        return self._conn.get(key)
+
+    def set(self, key, value):
+        self._conn.set(key, value)
 
     def getall(self, key):
         return self._conn.lrange(key, 0, -1)

@@ -12,7 +12,7 @@ config_register('max-last[int]', 2)
 
 class Markov(object):
     def __init__(self, config):
-        self.state = config.state_driver()
+        self.state = config.state_driver('ai')
         self.maxlast = config['max-last']
 
     def parse(self, text):
@@ -56,7 +56,8 @@ class Markov(object):
                     queue.popleft()
                 except IndexError:
                     pass
-        match = re.match(r'(.{{0,{max}}}[.?!])[^.?!]*?$'.format(max=message_length-1), message)
+        message = message[:message_length-1]
+        match = re.match(r'(.+[.?!])[^.?!]*?$'.format(max=message_length-1), message)
         if match:
             message = match.group(1)
         message = message.lstrip('-')
