@@ -49,7 +49,7 @@ class Markov(object):
                 message = word
             elif word != '':
                 message += ' '+word
-            if word:
+            if word or word == '':
                 queue.append(word)
             else:
                 try:

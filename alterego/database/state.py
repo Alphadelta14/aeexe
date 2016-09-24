@@ -28,7 +28,8 @@ class Garbage(str):
 
 
 class BaseDriver(object):
-    def __init__(self, config):
+    def __init__(self, config, extras=None):
+        extras_ = extras
         self.config = config
         random_config = config['random']
         self.random_gen = random.Random()
@@ -52,7 +53,7 @@ class BaseDriver(object):
         for key in keys:
             if self.weighted_rand():
                 value = self.random_choice(self.getall(key))
-                if value:
+                if not isinstance(value, Garbage):
                     return value
         try:
             key = self.random_key()
@@ -81,8 +82,8 @@ class BaseDriver(object):
 
 
 class MemoryDriver(BaseDriver):
-    def __init__(self, config):
-        BaseDriver.__init__(self, config)
+    def __init__(self, config, extras=None):
+        BaseDriver.__init__(self, config, extras)
         self._data = {}
 
     def append(self, key, value):
@@ -103,9 +104,13 @@ class MemoryDriver(BaseDriver):
 
 
 class RedisDriver(BaseDriver):
-    def __init__(self, config):
-        BaseDriver.__init__(self, config)
-        self._conn = redis.Redis(**config['redis'])
+    def __init__(self, config, extras=None):
+        if extras is None:
+            extras = {}
+        BaseDriver.__init__(self, config, extras)
+        options = config['redis']
+        options.update(extras)
+        self._conn = redis.Redis(**options)
 
     def append(self, key, value):
         self._conn.rpush(key, value)
