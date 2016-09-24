@@ -16,7 +16,7 @@ class Configuration(object):
     def __init__(self, filename=None):
         self._config = ConfigParser()
         self._set_defaults()
-        self._state_driver = None
+        self._state_drivers = {}
         if filename is not None:
             self.load(filename)
 
@@ -69,19 +69,20 @@ class Configuration(object):
             raise ValueError('Missing main section of configuration')
         return self['main'][name]
 
-    def state_driver(self):
+    def state_driver(self, name='ai'):
         """Get an instance of the state driver
         """
         from database import state
 
-        if self._state_driver is None:
-            if self['state-driver'] == 'redis':
-                self._state_driver = state.RedisDriver(self)
-            elif self['state-driver'] == 'dict':
-                self._state_driver = state.MemoryDriver(self)
+        if name not in self._state_drivers:
+            driver = self[name].get('state-driver')
+            if driver == 'redis':
+                self._state_drivers[name] = state.RedisDriver(self)
+            elif driver == 'dict':
+                self._state_drivers[name] = state.MemoryDriver(self)
             else:
                 raise ValueError('Unknown state driver')
-        return self._state_driver
+        return self._state_drivers[name]
 
 
 def config_register(name, default=None):
