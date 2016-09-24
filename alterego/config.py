@@ -75,11 +75,12 @@ class Configuration(object):
         from database import state
 
         if name not in self._state_drivers:
-            driver = self[name].get('state-driver')
+            extras = self[name]
+            driver = extras.pop('state-driver')
             if driver == 'redis':
-                self._state_drivers[name] = state.RedisDriver(self)
+                self._state_drivers[name] = state.RedisDriver(self, extras)
             elif driver == 'dict':
-                self._state_drivers[name] = state.MemoryDriver(self)
+                self._state_drivers[name] = state.MemoryDriver(self, extras)
             else:
                 raise ValueError('Unknown state driver')
         return self._state_drivers[name]
