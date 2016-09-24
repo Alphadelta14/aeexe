@@ -38,17 +38,33 @@ class Twitter(object):
             'status': status
         }).raise_for_status()
 
-    def home(self):
-        """Read the home timeline
+    def timeline(self, username=None):
+        """Reads a timeline
+
+        Parameters
+        ----------
+        username : str
+            User handle without the @. If None (default), will show the home
+
+        Returns
+        -------
+        tweet_texts : list(str)
         """
         state = self._config.state_driver('feeds')
-        last_since = int(state.get('since') or 0)
         params = {
             'count': self.config['timeline_count'],
         }
+        if username is None:
+            url = 'https://api.twitter.com/1.1/statuses/home_timeline.json'
+            since_key = 'since'
+        else:
+            url = 'https://api.twitter.com/1.1/statuses/user_timeline.json'
+            since_key = 'since:@{username}'.format(username=username)
+            params['screen_name'] = username
+        last_since = int(state.get(since_key) or 0)
         if last_since:
             params['since_id'] = last_since
-        resp = self.get('https://api.twitter.com/1.1/statuses/home_timeline.json', params)
+        resp = self.get(url, params)
         resp.raise_for_status()
         entries = resp.json()
         try:
@@ -65,4 +81,4 @@ class Twitter(object):
                 last_since = max(last_since, entry.get('id', 0))
                 print(last_since, entry.get('id'))
         finally:
-            state.set('since', last_since)
+            state.set(since_key, last_since)

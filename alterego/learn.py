@@ -8,8 +8,9 @@ from alterego.outgoing.twitter import Twitter
 
 
 class AELearn(object):
-    def __init__(self, config):
+    def __init__(self, config, dry=False):
         self._config = config
+        self.dry = dry
         self.markov = markov.Markov(self._config)
 
     def learn(self, args):
@@ -30,6 +31,7 @@ class AELearn(object):
                     self.learn_text(text)
 
     def learn_text(self, text):
+        print('Learning {}'.format(text.encode('ascii', 'ignore')))
         self.markov.parse(text)
 
     def learn_file(self, location):
@@ -40,6 +42,10 @@ class AELearn(object):
     def learn_twitter(self, location):
         if location == 'home':
             twitter = Twitter(self._config)
-            return twitter.home()
+            return twitter.timeline()
+        elif location.startswith('@'):
+            twitter = Twitter(self._config)
+            return twitter.timeline(location[1:])
         else:
-            raise ValueError('Only twitter://home is supported at this time')
+            raise ValueError('Only twitter://home and twitter://@username are'
+                             'supported at this time')
