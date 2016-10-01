@@ -77,6 +77,8 @@ class Twitter(object):
                 text = entry.get('text')
                 if not text:
                     continue
+                if text.startswith('RT @'):
+                    continue
                 yield text.replace('\n', ' ')
                 last_since = max(last_since, entry.get('id', 0))
                 print(last_since, entry.get('id'))
