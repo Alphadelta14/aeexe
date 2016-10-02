@@ -10,6 +10,7 @@ import argparse
 import sys
 
 from alterego.ai.markov import Markov
+from alterego.ai.spider import Spider
 from alterego.config import Configuration
 from alterego.learn import AELearn
 from alterego.outgoing.twitter import Twitter
@@ -19,11 +20,12 @@ def parse_args(argv=None):
     root = argparse.ArgumentParser()
     root.add_argument('--config', '-c', default='config.ini')
     root.add_argument('--length', '-n', default=100, type=int)
-    root.add_argument('command', choices=('help', 'learn', 'say', 'tweet', 'generate'),
+    root.add_argument('command', choices=('help', 'learn', 'say', 'tweet', 'generate', 'scrape'),
                       default='help')
-    root.add_argument('args', nargs='*')
+    # root.add_argument('args', nargs='*')
 
-    args = root.parse_args(argv)
+    args, rest = root.parse_known_args(argv)
+    args.args = rest
     if args.command == 'help':
         root.print_help()
         sys.exit(0)
@@ -41,6 +43,8 @@ def main():
     config = Configuration(filename=args.config)
     if args.command == 'learn':
         AELearn(config).learn(args.args)
+    elif args.command == 'scrape':
+        Spider(config).scrape(args.args)
     elif args.command == 'tweet':
         message = Markov(config).say(args.length)
         print(message)
