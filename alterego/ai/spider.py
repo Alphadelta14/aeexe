@@ -6,6 +6,7 @@ import re
 
 import requests
 from six.moves.urllib.parse import unquote
+from six.moves.html_parser import HTMLParser
 
 
 class Spider(object):
@@ -132,6 +133,7 @@ class Spider(object):
         html = self.fetch(page, crawl)
         content = html.replace('</p>', '\n')
         content = re.sub(r'<.*?>', ' ', content)
+        content = HTMLParser().unescape(content)
         content = content.encode('utf8')
         if self.out_file:
             with open(self.out_file, 'a') as handle:

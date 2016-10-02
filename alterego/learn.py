@@ -33,7 +33,10 @@ class AELearn(object):
                     self.learn_text(text)
 
     def learn_text(self, text):
-        print('Learning {}'.format(text.encode('ascii', 'ignore')))
+        try:
+            print('Learning {}'.format(text.encode('ascii', 'ignore')))
+        except UnicodeDecodeError:
+            print('Learning <something>')
         self.markov.parse(text)
 
     def learn_file(self, location):
