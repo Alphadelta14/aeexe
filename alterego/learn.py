@@ -1,5 +1,5 @@
 
-import csv
+import glob
 import re
 
 from alterego.ai import markov
@@ -22,10 +22,12 @@ class AELearn(object):
             if protocol == 'http':
                 self.learn_web(arg)
             elif protocol == 'file':
-                self.learn_file(location)
+                for single_location in glob.glob(location):
+                    self.learn_file(single_location)
             elif protocol == 'ssa':
-                for text in learn_ssa(location):
-                    self.learn_text(text)
+                for single_location in glob.glob(location):
+                    for text in learn_ssa(single_location):
+                        self.learn_text(text)
             elif protocol == 'twitter':
                 for text in self.learn_twitter(location):
                     self.learn_text(text)
