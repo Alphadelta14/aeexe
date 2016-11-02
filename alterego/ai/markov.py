@@ -11,9 +11,12 @@ config_register('max-last[int]', 2)
 
 
 class Markov(object):
-    def __init__(self, config):
+    def __init__(self, config, last=None):
         self.state = config.state_driver('ai')
-        self.maxlast = config['max-last']
+        if not last:
+            self.maxlast = config['max-last']
+        else:
+            self.maxlast = last
 
     def parse(self, text):
         """Read some text and create new Markov mappings

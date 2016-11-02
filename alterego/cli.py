@@ -20,6 +20,7 @@ def parse_args(argv=None):
     root = argparse.ArgumentParser()
     root.add_argument('--config', '-c', default='config.ini')
     root.add_argument('--length', '-n', default=100, type=int)
+    root.add_argument('--last', '-l', type=int, help='Markov Last param. Default: use config.')
     root.add_argument('command', choices=('help', 'learn', 'say', 'tweet', 'generate', 'scrape'),
                       default='help')
     # root.add_argument('args', nargs='*')
@@ -46,11 +47,11 @@ def main():
     elif args.command == 'scrape':
         Spider(config).scrape(args.args)
     elif args.command == 'tweet':
-        message = Markov(config).say(args.length)
+        message = Markov(config, args.last).say(args.length)
         print(message)
         Twitter(config).tweet(message)
     elif args.command == 'say':
-        print(Markov(config).say(args.length))
+        print(Markov(config, args.last).say(args.length))
     return 0
 
 
